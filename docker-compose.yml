@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:6.0 # pulls MongoDB version 6.0 from Docker Hub
+    ports:
+      - "27017:27017" # maps pc port 27017 to the container’s port 27017
+    volumes: #-mongodata:/data/db  <- named volume: stores DB data on docker VM (in a special directory) so it's not wiped when the container stops
+      - ./mongodata:/data/db # <- binds to local so I'll see the mongodata folder in my project directory (better for dev)
+
+  backend:
+    build: .
+    ports:
+      - "3001:5000"
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  frontend:
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./client:/app
